@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <style>
 :root{
   --navy:#1A3A6E; --navy-deep:#0F2547; --orange:#E8611A;
@@ -169,7 +172,7 @@ table.t input.num{width:90px;border:1px solid var(--line);border-radius:5px;padd
   <div class="top-in">
     <div class="brand"><b>PORTO<i>EX</i></b><span>Estoque · acompanhamento de movimentos</span></div>
     <div class="grow"></div>
-    <div class="sync" id="sync">Carregando planilha…</div>
+    <div class="sync" id="sync">Conectando ao app ESTOQUE…</div>
     <button class="btn ghost" id="btnReload" title="Recarregar dados da planilha">Atualizar</button>
   </div>
   <nav class="tabs" aria-label="Seções">
@@ -291,7 +294,7 @@ table.t input.num{width:90px;border:1px solid var(--line);border-radius:5px;padd
     </div>
   </section>
 
-  <div id="loading" class="loading">Carregando dados da planilha…</div>
+  <div id="loading" class="loading">Carregando lançamentos do app ESTOQUE…</div>
 </main>
 <div class="toast" id="toast"></div>
 
@@ -303,6 +306,18 @@ const DEFAULT_SHEET = '1XMrbxdHPRFao2MfBprrk2Chf1NvF0iBN-vxVHzLKDoc';
 const ABA_MOV = 'MOVIMENTAÇÃO APK';
 const LS_KEY = 'portoex_estoque_acomp_cfg_v1';
 const REFRESH_MS = 5 * 60 * 1000;
+/* Lançamentos vêm do app de lançamentos (andreluis-star.github.io/ESTOQUE),
+   que grava no Firebase Realtime Database, nó "estoque". Leitura em tempo real. */
+const FB_RAIZ = 'estoque';
+const FB_CONFIG = {
+  apiKey: 'AIzaSyC7z_sLiojkDBmOFK4pjSCqFACzArfZDts',
+  authDomain: 'estoquemov.firebaseapp.com',
+  databaseURL: 'https://estoquemov-default-rtdb.firebaseio.com',
+  projectId: 'estoquemov',
+  storageBucket: 'estoquemov.firebasestorage.app',
+  messagingSenderId: '622586330244',
+  appId: '1:622586330244:web:06fe48b8fd7b32d24d96d1'
+};
 
 const MESES = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
 const MES_CURTO = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -483,33 +498,97 @@ function readList(table){
   return table.slice(1).filter(r => r[iN] && r[iN].trim()).map(r => ({nome: r[iN].trim(), ativo: iA < 0 || norm(r[iA]) !== 'NAO'}));
 }
 
+/* =========================================================
+   LEITURA DOS LANÇAMENTOS (Firebase do app ESTOQUE, tempo real)
+   ========================================================= */
+const FB = { mov:null, cad:null, ini:[], iniLido:false, ultimo:null, conectado:false, iniciado:false };
+let fbTimer = 0;
+function fbAgendar(){ clearTimeout(fbTimer); fbTimer = setTimeout(fbAplicar, 250); }
+function fbErro(e){
+  $('loading').style.display = 'none';
+  $('sync').textContent = 'Erro ao carregar';
+  $('alert').innerHTML = `<div class="msg err"><b>Não foi possível ler os lançamentos do app ESTOQUE.</b> ${esc((e && (e.code || e.message)) || e)}. Confira as regras do Realtime Database (projeto estoquemov) e se o login Anônimo está ativado.</div>`;
+}
+function fbIniciar(){
+  if (FB.iniciado) return; FB.iniciado = true;
+  if (typeof firebase === 'undefined') return fbErro('O Firebase não carregou (sem internet ao abrir a página?). Recarregue a página');
+  let app;
+  try { app = firebase.apps.find(a => a.name === 'estoque') || firebase.initializeApp(FB_CONFIG, 'estoque'); }
+  catch(e){ return fbErro(e); }
+  const db = app.database(), root = db.ref(FB_RAIZ);
+  db.ref('.info/connected').on('value', sn => { FB.conectado = !!sn.val(); syncTxt(); });
+  const ouvir = () => {
+    root.child('mov').on('value', sn => { FB.mov = sn.val() || {}; FB.ultimo = new Date(); fbAgendar(); }, fbErro);
+    root.child('cad').on('value', sn => { FB.cad = sn.val() || {}; fbAgendar(); }, () => { FB.cad = {}; fbAgendar(); });
+  };
+  app.auth().signInAnonymously().then(ouvir).catch(e => { console.warn('Login anônimo falhou:', e && e.message); ouvir(); });
+}
+function syncTxt(){
+  if (!S.loaded) return;
+  const hora = FB.ultimo ? FB.ultimo.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '--:--';
+  $('sync').innerHTML = `${S.rows.length} lançamentos · app ESTOQUE<br>${FB.conectado ? 'ao vivo · ' : 'offline · '}atualizado às ${hora}`;
+}
+function cadNomes(tipo, soAtivos){
+  const o = (FB.cad && FB.cad[tipo]) || {};
+  return Object.keys(o).map(k => ({ nome: (o[k] && o[k].nome) || k, ativo: !(o[k] && o[k].ativo === false) }))
+    .filter(x => !soAtivos || x.ativo).map(x => x.nome).sort((a,b) => a.localeCompare(b));
+}
+function regsFirebase(){
+  const out = [];
+  Object.keys(FB.mov || {}).forEach(m => {
+    const o = FB.mov[m] || {};
+    Object.keys(o).forEach(id => {
+      const r = o[id] || {};
+      out.push({ id: r.id || id, data: r.data || '', hi: r.hi || '', hf: r.hf || '', cliente: r.cliente || '', mov: r.mov || '', colab: r.colab || '',
+        nf: r.nf || '', sku: +r.sku || 0, vol: +r.vol || 0, un: +r.un || 0, pal: +r.pal || 0, div: r.div === 'SIM', obs: r.obs || '' });
+    });
+  });
+  return out.sort((a,b) => (a.data + a.hi).localeCompare(b.data + b.hi));
+}
+/* saldo inicial de paletes: linhas "INICIO" que existiam na planilha antiga (lidas uma vez, só se ainda não houver saldos definidos) */
+async function lerIniciosPlanilha(){
+  if (FB.iniLido || S.cfg.saldosDefinidos || Object.keys(S.cfg.saldos).length) { FB.iniLido = true; return; }
+  try { const t = await loadSheet(ABA_MOV); const bak = S.rows; buildRows(t); FB.ini = S.rows.filter(r => r.isInicio); S.rows = bak; }
+  catch(e){ FB.ini = []; }
+  FB.iniLido = true;
+}
+let iniPedido = false;
+function fbAplicar(){
+  if (FB.mov == null || FB.cad == null) return;
+  /* saldo inicial lido em segundo plano: não atrasa a tela */
+  if (!FB.iniLido && !iniPedido){ iniPedido = true; lerIniciosPlanilha().then(() => { if (FB.ini.length) fbAplicar(); }); }
+  buildRowsFirebase(regsFirebase());
+  S.rows = FB.ini.concat(S.rows);
+  S.clientes = cadNomes('clientes');
+  S.clientesAtivos = new Set(cadNomes('clientes', true));
+  S.colabs = cadNomes('colaboradores');
+  S.movs = cadNomes('movimentos');
+  if (!S.cfg.saldosDefinidos && Object.keys(S.cfg.saldos).length === 0) S.cfg.saldos = saldosDoInicio();
+  S.loaded = true;
+  $('alert').innerHTML = '';
+  $('loading').style.display = 'none';
+  syncTxt();
+  fillFilters();
+  renderAll();
+}
 async function loadAll(){
-  $('sync').textContent = 'Atualizando…';
-  try {
-    const [mov, cli, col, mvs] = await Promise.all([
-      loadSheet(ABA_MOV), loadSheet('CLIENTES').catch(()=>[]), loadSheet('COLABORADORES').catch(()=>[]), loadSheet('MOVIMENTOS').catch(()=>[])
-    ]);
-    buildRows(mov);
-    const cl = readList(cli);
-    S.clientes = cl.map(c => c.nome);
-    S.clientesAtivos = new Set(cl.filter(c => c.ativo).map(c => c.nome));
-    S.colabs = readList(col).map(c => c.nome);
-    S.movs = readList(mvs).map(c => c.nome);
-    if (!S.cfg.saldosDefinidos && Object.keys(S.cfg.saldos).length === 0) {
-      S.cfg.saldos = saldosDoInicio();
-    }
-    S.loaded = true;
-    $('alert').innerHTML = '';
-    $('loading').style.display = 'none';
-    const d = new Date();
-    $('sync').innerHTML = `${S.rows.length} lançamentos<br>atualizado às ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
-    fillFilters();
-    renderAll();
-  } catch (e) {
-    $('loading').style.display = 'none';
-    $('sync').textContent = 'Erro ao carregar';
-    $('alert').innerHTML = `<div class="msg err"><b>Não foi possível ler a planilha.</b> ${esc(e.message)}. Confira se ela está compartilhada como "Qualquer pessoa com o link pode ver" e se a aba "${ABA_MOV}" existe. O ID da planilha pode ser ajustado na aba Paletes.</div>`;
-  }
+  if (!FB.iniciado){ $('sync').textContent = 'Conectando…'; fbIniciar(); }
+  else fbAplicar();
+}
+function buildRowsFirebase(regs){
+  S.rows = regs.filter(r => r.cliente).map(r => {
+    const hi = parseTime(r.hi), hf = parseTime(r.hf);
+    let dur = (hi != null && hf != null) ? hf - hi : null;
+    if (dur != null && dur < 0) dur += 1440;
+    const date = /^\d{4}-\d{2}-\d{2}/.test(r.data) ? r.data.slice(0,10) : parseDate(r.data);
+    return {
+      id: r.id, ymd: date, ym: date ? date.slice(0,7) : null,
+      cliente: String(r.cliente).toUpperCase(), movTxt: r.mov, mk: movKey(r.mov), colab: String(r.colab).toUpperCase(),
+      doc: String(r.nf), sku: r.sku, vol: r.vol, un: r.un, pal: r.pal, hi, hf, dur,
+      hiTxt: String(r.hi).slice(0,5), hfTxt: String(r.hf).slice(0,5), div: r.div, obs: r.obs,
+      isInicio: /^INICIO/.test(norm(r.nf))
+    };
+  });
 }
 
 function buildRows(table){
@@ -1021,8 +1100,7 @@ $('cImport').addEventListener('change', async e => {
    ========================================================= */
 (async function init(){
   await loadCfg();
-  await loadAll();
-  setInterval(loadAll, REFRESH_MS);
+  await loadAll();   // depois disso os lançamentos chegam sozinhos, em tempo real
 })();
 </script>
 </body>
