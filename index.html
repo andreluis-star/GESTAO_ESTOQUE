@@ -164,6 +164,81 @@ table.t input.num{width:90px;border:1px solid var(--line);border-radius:5px;padd
 .foot{font-size:12px;color:var(--muted);margin-top:8px}
 @media (max-width:700px){.top-in{flex-wrap:wrap}.sync{text-align:left}main{padding:14px 12px 30px}.filters select,.filters input{min-width:120px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ── Acertos (módulo migrado do app ESTOQUE) ── */
+.ac-ctrl{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.ac-ctrl label{display:flex;flex-direction:column;font-size:12px;color:var(--muted);gap:3px}
+.ac-ctrl select,.ac-ctrl input,.ac-dlg input,.ac-dlg select{border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:#fff;min-width:140px}
+.ac-seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.ac-seg button{border:0;background:#fff;padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px}
+.ac-seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.ac-ctrl .ac-user{margin-left:auto;font-size:12px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.ac-acoes{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin:12px 0}
+.ac-folha{background:#fff;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.ac-cab{background:#C99A06;color:#3B2A00;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:22px;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.ac-cab b{font-size:30px;color:#1F1600;background:rgba(255,255,255,.35);border-radius:6px;padding:0 10px;font-variant-numeric:tabular-nums}
+.ac-cab small{font-family:Inter,sans-serif;font-weight:500;font-size:12px;color:#4A3800;flex-basis:100%}
+.ac-cli{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;color:var(--navy);padding:10px 16px 0}
+.ac-wrap{overflow-x:auto}
+table.ac{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+table.ac th{background:#2F6B4F;color:#fff;font-weight:700;font-size:12px;padding:8px;border:1px solid #255740;text-align:center;line-height:1.2}
+table.ac td{border:1px solid #D3D9D5;padding:5px 8px;white-space:nowrap;text-align:center}
+table.ac td.l{text-align:left}
+table.ac td.tot{background:#A9D18E;font-weight:700}
+table.ac td.neg,table.ac-sub td.neg{color:var(--bad);font-weight:700}
+table.ac td.frac{background:#FFE9B3!important;font-weight:700}
+table.ac tbody tr:nth-child(even) td:not(.tot):not(.frac){background:#F7F9F8}
+table.ac tfoot td{font-weight:700;border:0;padding:8px}
+.ac-pe{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;padding:14px 16px 18px}
+table.ac-sub{border-collapse:collapse;font-size:14px;min-width:240px}
+table.ac-sub td{border:1px solid #1F1600;padding:5px 12px;font-weight:700;font-variant-numeric:tabular-nums}
+table.ac-sub td:first-child{background:#FFC000;text-align:center;min-width:130px}
+table.ac-sub td:last-child{text-align:center;min-width:80px;background:#fff}
+table.ac-sub tr.sep td{border:0;background:transparent;height:10px;padding:0}
+.ac-res{display:grid;grid-template-columns:repeat(2,auto);gap:4px 16px;font-size:14px;align-content:start}
+.ac-res span{color:var(--muted)}
+.ac-res b{text-align:right;font-variant-numeric:tabular-nums}
+.ac-alerta{margin:10px 16px 0;padding:8px 12px;border-radius:8px;background:#FDEEE4;color:#7A2E06;font-size:13px}
+.ac-vazio{background:var(--card);border:2px dashed var(--line);border-radius:8px;padding:24px;text-align:center;color:var(--muted);margin-top:14px}
+.ac-nota{font-size:12px;color:var(--muted);margin:6px 0}
+.fr{border-top:3px solid #C99A06;padding:14px 16px 18px}
+.fr h3{font-weight:700;font-size:20px;color:var(--navy);margin:0 0 10px}
+.fr h3 span{font-family:Inter,sans-serif;font-size:12px;font-weight:500;color:var(--muted)}
+.fr-num{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.fr-num>div{background:#F4F6F9;border-radius:8px;padding:10px 12px}
+.fr-num b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:30px;line-height:1.05;color:var(--navy);font-variant-numeric:tabular-nums}
+.fr-num span{font-size:12px;color:var(--muted)}
+.fr-num .dest{background:var(--navy)}.fr-num .dest b{color:#fff}.fr-num .dest span{color:#B8C6DC}
+.fr-bar{height:16px;background:#E7EBF1;border-radius:8px;overflow:hidden;margin-bottom:6px}
+.fr-bar i{display:block;height:100%;background:linear-gradient(90deg,#C99A06,var(--orange))}
+.fr-cob{font-size:14px;margin:8px 0 10px}
+.ac-prem{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:16px}
+.ac-prem h2{margin:0 0 4px;font-size:22px;color:var(--navy)}
+.ac-prem .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:10px}
+.ac-prem h3{margin:0 0 8px;font-size:18px;color:var(--navy)}
+.ac-linha{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #EDF0F4}
+.ac-linha .nm{flex:1;font-weight:600}
+.ac-linha.off .nm{color:var(--muted);text-decoration:line-through}
+.ac-mini{border:1px solid var(--line);background:#fff;border-radius:5px;padding:3px 8px;font-size:12px;cursor:pointer}
+.ac-tag{font-size:11px;font-weight:600;padding:1px 8px;border-radius:10px;background:#E3F4EC;color:#1E8A5A}
+.ac-tag.off{background:#EEF0F3;color:var(--muted)}
+dialog.ac-dlg{border:0;border-radius:10px;padding:0;max-width:520px;width:calc(100% - 32px);box-shadow:0 20px 50px rgba(15,37,71,.35)}
+dialog.ac-dlg::backdrop{background:rgba(15,37,71,.45)}
+.ac-dlg h3{margin:0;padding:14px 18px;background:var(--navy);color:#fff;font-size:20px}
+.ac-dlg .corpo{padding:16px 18px;display:grid;gap:12px}
+.ac-dlg label{display:flex;flex-direction:column;font-size:13px;font-weight:600;gap:4px}
+.ac-dlg .rod{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.ac-dlg .err{background:#FDECEA;color:#8E1E1E;border-radius:6px;padding:8px 10px;font-size:13px}
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body{background:#fff}
+  .top,#filters,#alert,.ac-ctrl,.ac-acoes,.no-print,.ac-prem,.toast{display:none!important}
+  main{padding:0!important;max-width:none!important}
+  .ac-folha{border:0}
+  table.ac{font-size:10.5px}
+  table.ac td,table.ac th{padding:3px 5px}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
@@ -183,6 +258,7 @@ table.t input.num{width:90px;border:1px solid var(--line);border-radius:5px;padd
       <button role="tab" data-view="lanc" aria-selected="false">Lançamentos</button>
       <button role="tab" data-view="ov" aria-selected="false">Ocupação x Valor</button>
       <button role="tab" data-view="pal" aria-selected="false">Paletes</button>
+      <button role="tab" data-view="acertos" aria-selected="false">Acertos</button>
     </div>
   </nav>
 </header>
@@ -262,6 +338,8 @@ table.t input.num{width:90px;border:1px solid var(--line);border-radius:5px;padd
   </section>
 
   <!-- PALETES -->
+  <section class="view" id="v-acertos"><div id="acRoot"><div class="loading">Carregando…</div></div></section>
+
   <section class="view" id="v-pal">
     <div class="panel">
       <div class="rack-head">
@@ -540,7 +618,7 @@ function regsFirebase(){
     Object.keys(o).forEach(id => {
       const r = o[id] || {};
       out.push({ id: r.id || id, data: r.data || '', hi: r.hi || '', hf: r.hf || '', cliente: r.cliente || '', mov: r.mov || '', colab: r.colab || '',
-        nf: r.nf || '', sku: +r.sku || 0, vol: +r.vol || 0, un: +r.un || 0, pal: +r.pal || 0, div: r.div === 'SIM', obs: r.obs || '' });
+        nf: r.nf || '', subcli: r.subcli || '', sku: +r.sku || 0, vol: +r.vol || 0, un: +r.un || 0, pal: +r.pal || 0, div: r.div === 'SIM', obs: r.obs || '' });
     });
   });
   return out.sort((a,b) => (a.data + a.hi).localeCompare(b.data + b.hi));
@@ -583,7 +661,7 @@ function buildRowsFirebase(regs){
     const date = /^\d{4}-\d{2}-\d{2}/.test(r.data) ? r.data.slice(0,10) : parseDate(r.data);
     return {
       id: r.id, ymd: date, ym: date ? date.slice(0,7) : null,
-      cliente: String(r.cliente).toUpperCase(), movTxt: r.mov, mk: movKey(r.mov), colab: String(r.colab).toUpperCase(),
+      cliente: String(r.cliente).toUpperCase(), subcli: r.subcli || '', movTxt: r.mov, mk: movKey(r.mov), colab: String(r.colab).toUpperCase(),
       doc: String(r.nf), sku: r.sku, vol: r.vol, un: r.un, pal: r.pal, hi, hf, dur,
       hiTxt: String(r.hi).slice(0,5), hfTxt: String(r.hf).slice(0,5), div: r.div, obs: r.obs,
       isInicio: /^INICIO/.test(norm(r.nf))
@@ -758,6 +836,7 @@ function renderAll(){
   renderLanc(list);
   renderOV();
   renderPal();
+  if (window.AC) AC.render();
 }
 
 function renderGeral(list){
@@ -856,13 +935,13 @@ function renderTabela(id, list, keyFn, nome){
 function renderLanc(list){
   const q = norm($('q').value);
   let l = list;
-  if (q) l = l.filter(r => norm([r.doc, r.obs, r.cliente, r.colab, r.id].join(' ')).includes(q));
+  if (q) l = l.filter(r => norm([r.doc, r.obs, r.cliente, r.subcli, r.colab, r.id].join(' ')).includes(q));
   l = l.slice().sort((a,b) => (b.ymd||'').localeCompare(a.ymd||'') || (b.hi||0) - (a.hi||0));
   $('lancCount').textContent = `${fmtInt(l.length)} lançamentos`;
   const show = l.slice(0, S.limit);
   $('more').style.display = l.length > S.limit ? '' : 'none';
   $('tLanc').innerHTML = `<thead><tr><th>Data</th><th>Cliente</th><th style="text-align:left">Movimento</th><th style="text-align:left">Colaborador</th><th style="text-align:left">NF / DI / PED</th><th>Início</th><th>Fim</th><th>Duração</th><th>SKUs</th><th>Volumes</th><th>Unidades</th><th>Paletes</th><th>Diverg.</th><th style="text-align:left">Observações</th></tr></thead>
-  <tbody>${show.map(r => `<tr><td class="l">${brDate(r.ymd)}</td><td class="l">${esc(r.cliente)}</td>
+  <tbody>${show.map(r => `<tr><td class="l">${brDate(r.ymd)}</td><td class="l">${esc(r.cliente)}${r.subcli ? ' <span style="color:var(--muted)">/ ' + esc(r.subcli) + '</span>' : ''}</td>
     <td class="l">${MOV[r.mk] ? `<span class="pill" style="--c:${MOV[r.mk].color}">${MOV[r.mk].short}</span>` : esc(r.movTxt)}</td>
     <td class="l">${esc(r.colab)}</td><td class="l">${esc(r.doc)}</td><td>${esc(r.hiTxt)}</td><td>${esc(r.hfTxt)}</td><td>${fmtMin(r.dur)}</td>
     <td>${fmtInt(r.sku)}</td><td>${fmtInt(r.vol)}</td><td>${fmtInt(r.un)}</td><td>${fmtInt(palSigned(r))}</td>
@@ -1012,7 +1091,8 @@ document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('cl
   document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
   document.querySelectorAll('section.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + b.dataset.view));
   S.view = b.dataset.view;
-  $('filters').style.display = (S.view === 'ov' || S.view === 'pal') ? 'none' : '';
+  $('filters').style.display = (S.view === 'ov' || S.view === 'pal' || S.view === 'acertos') ? 'none' : '';
+  if (S.view === 'acertos' && window.AC) AC.render();
   Object.values(S.charts).forEach(c => c.resize());
 }));
 ['fCli','fMov','fCol'].forEach(id => $(id).addEventListener('change', () => { S.limit = 200; renderAll(); }));
@@ -1101,6 +1181,355 @@ $('cImport').addEventListener('change', async e => {
 (async function init(){
   await loadCfg();
   await loadAll();   // depois disso os lançamentos chegam sozinhos, em tempo real
+})();
+</script>
+<script>
+/* =========================================================
+   ACERTOS — módulo trazido do app ESTOQUE (mesmo banco Firebase, nó "estoque")
+   Premissas (gravadas no banco, as mesmas do app ESTOQUE):
+   - ocupacao/{AAAA-MM}/{CLIENTE} = fechamento do mês { cliente, pallets, sub:{SUBCLIENTE:n} }
+     → o acerto de um mês começa com o fechamento do mês anterior
+   - cad/subclientes/{key} = { nome, cliente, ativo }
+   - cad/volpal/{CLIENTE} = { nome, vol, tipos:'SEP'|'TODOS' } → volumes que formam 1 palete
+   - frac/{AAAA-MM}/{id} = volumes acumulados lançados à mão { data, cliente, vol, obs, por, ts }
+   Para gravar é preciso entrar com um usuário do app ESTOQUE (administrador para as premissas).
+   ========================================================= */
+(function(){
+  const NOMES_MES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const p2 = n => String(n).padStart(2,'0');
+  const up = s => String(s == null ? '' : s).trim().toUpperCase();
+  const chave = s => (String(s == null ? '' : s).trim().replace(/[.#$\[\]\/]/g,'_').replace(/\s+/g,' ').slice(0,200)) || '_';
+  const isoDe = d => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+  const hojeISO = () => isoDe(new Date());
+  const mesAtual = () => hojeISO().slice(0,7);
+  const dataBR = iso => iso ? String(iso).slice(0,10).split('-').reverse().join('/') : '';
+  const nf = n => (Number(n) || 0).toLocaleString('pt-BR');
+  const r2 = n => Math.round(n * 100) / 100;
+  const ehSep = m => /SEPARA/i.test(m || '');
+  const seg = h => { const m = String(h || '').match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/); return m ? (+m[1]) * 3600 + (+m[2]) * 60 + (+(m[3] || 0)) : null; };
+  const dur = (hi, hf) => { const a = seg(hi), b = seg(hf); if (a == null || b == null) return null; let d = b - a; if (d < 0) d += 86400; return d; };
+  const fmtDur = s => { if (s == null || isNaN(s)) return '--:--:--'; s = Math.max(0, Math.round(s)); return p2(Math.floor(s / 3600)) + ':' + p2(Math.floor(s % 3600 / 60)) + ':' + p2(s % 60); };
+  const mesSo = m => NOMES_MES[+String(m).slice(5,7) - 1] || '';
+  const mesNome = m => mesSo(m) + ' ' + String(m).slice(0,4);
+  const mesMais = (m, k) => { const [a, b] = m.split('-').map(Number); const d = new Date(a, b - 1 + k, 1); return d.getFullYear() + '-' + p2(d.getMonth() + 1); };
+  const ultimoDia = m => { const [a, b] = m.split('-').map(Number); return m + '-' + p2(new Date(a, b, 0).getDate()); };
+  const diaAntes = iso => { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() - 1); return isoDe(d); };
+  const mesesEntre = (m1, m2) => { const o = []; for (let m = m1, i = 0; m <= m2 && i < 60; m = mesMais(m, 1), i++) o.push(m); return o; };
+  const novoId = () => 'M' + Date.now().toString(36).toUpperCase() + Math.floor(Math.random() * 46656).toString(36).toUpperCase().padStart(3,'0');
+  const avisar = msg => (typeof toast === 'function' ? toast(msg) : alert(msg));
+  const el = id => document.getElementById(id);
+
+  /* ---------- dados ---------- */
+  const A = { cliente:'', modo:'mes', mes:mesAtual(), de:hojeISO().slice(0,8) + '01', ate:hojeISO() };
+  const DB = { oc:null, fr:null, iniciado:false };
+  let user = null; try { user = JSON.parse(sessionStorage.getItem('ac_user') || 'null'); } catch(e){}
+  function raiz(){ try { return firebase.app('estoque').database().ref('estoque'); } catch(e){ return null; } }
+  function iniciar(){
+    if (DB.iniciado) return;
+    const r = raiz(); if (!r) return;
+    DB.iniciado = true;
+    const ouvir = () => {
+      r.child('ocupacao').on('value', s => { DB.oc = s.val() || {}; render(); }, () => { DB.oc = {}; render(); });
+      r.child('frac').on('value', s => { DB.fr = s.val() || {}; render(); }, () => { DB.fr = {}; render(); });
+    };
+    let ok = false; const go = () => { if (!ok){ ok = true; ouvir(); } };
+    try { firebase.app('estoque').auth().onAuthStateChanged(u => { if (u) go(); }); } catch(e){}
+    setTimeout(go, 4000);
+  }
+  const cad = tipo => (typeof FB !== 'undefined' && FB.cad && FB.cad[tipo]) || {};
+  const clientesAtivos = () => Object.values(cad('clientes')).filter(x => x && x.ativo !== false).map(x => x.nome).filter(Boolean).sort((a,b) => a.localeCompare(b));
+  const subLista = () => Object.entries(cad('subclientes')).map(([k, x]) => ({ key:k, nome:(x && x.nome) || k, cliente:(x && x.cliente) || '', ativo:!(x && x.ativo === false) }));
+  const subsDe = (cli, todos) => subLista().filter(x => (todos || x.ativo) && up(x.cliente) === up(cli)).map(x => x.nome).sort((a,b) => a.localeCompare(b));
+  function volPalDe(cli){ const x = cad('volpal')[chave(up(cli))]; return x && +x.vol > 0 ? { vol:+x.vol, todos:x.tipos === 'TODOS' } : null; }
+  let cacheRegs = null, cacheChave = null;
+  function registros(){
+    if (typeof FB === 'undefined' || !FB.mov) return [];
+    if (cacheChave === FB.mov) return cacheRegs;
+    const out = [];
+    Object.keys(FB.mov).forEach(m => { const o = FB.mov[m] || {}; Object.keys(o).forEach(id => { const r = o[id] || {};
+      out.push({ id:r.id || id, data:r.data || '', hi:r.hi || '', hf:r.hf || '', cliente:up(r.cliente), subcli:r.subcli || '', mov:r.mov || '',
+        nf:r.nf || '', vol:+r.vol || 0, un:+r.un || 0, pal:+r.pal || 0, obs:r.obs || '', ts:r.ts || '' }); }); });
+    cacheRegs = out; cacheChave = FB.mov; return out;
+  }
+  const regsCli = (cli, de, ate) => registros().filter(r => r.cliente === up(cli) && r.data >= de && r.data <= ate)
+    .sort((a, b) => (a.data + a.hi + String(a.ts)).localeCompare(b.data + b.hi + String(b.ts)));
+  const ocupEntrada = (cli, m) => Object.values((DB.oc || {})[m] || {}).find(x => x && up(x.cliente) === up(cli));
+  const fracLista = m => Object.entries((DB.fr || {})[m] || {}).map(([id, x]) => Object.assign({ id, mes:m }, x));
+  function subDeOcup(cli, sub){ const o = {}, nomes = subsDe(cli, true); Object.entries(sub || {}).forEach(([k, v]) => { const n = nomes.find(x => chave(x) === k) || k; o[n] = (o[n] || 0) + (+v || 0); }); return o; }
+  const somaSub = (a, b) => { const o = Object.assign({}, a); Object.entries(b).forEach(([k, v]) => { o[k] = (o[k] || 0) + v; }); return o; };
+  function movPal(L){ let t = 0; const sub = {}; L.forEach(r => { t += r.pal; const k = r.subcli || ''; sub[k] = (sub[k] || 0) + r.pal; }); return { t, sub }; }
+  function abertura(cli, m, nivel = 0){
+    const ant = mesMais(m, -1), e = ocupEntrada(cli, ant);
+    if (e && e.pallets != null && e.pallets !== '') return { total:+e.pallets || 0, sub:subDeOcup(cli, e.sub), fonte:'ocup', ref:ant };
+    const primeiro = Object.keys((typeof FB !== 'undefined' && FB.mov) || {}).sort()[0] || m;
+    if (nivel >= 24 || ant < primeiro) return { total:0, sub:{}, fonte:'nenhum', ref:ant };
+    const a = abertura(cli, ant, nivel + 1);
+    const mv = movPal(regsCli(cli, ant + '-01', ultimoDia(ant)));
+    return { total:a.total + mv.t, sub:somaSub(a.sub, mv.sub), fonte:'calc', ref:a.ref, base:a.fonte };
+  }
+
+  function calc(){
+    if (!A.cliente) A.cliente = clientesAtivos().find(c => subsDe(c).length) || clientesAtivos()[0] || '';
+    let de, ate;
+    if (A.modo === 'mes'){ de = A.mes + '-01'; ate = ultimoDia(A.mes); }
+    else { de = A.de || hojeISO().slice(0,8) + '01'; ate = A.ate || hojeISO(); if (de > ate) [de, ate] = [ate, de]; }
+    const mesIni = de.slice(0,7), meses = mesesEntre(mesIni, ate.slice(0,7));
+    const X = { de, ate, mesIni, meses, cliente:A.cliente };
+    if (!A.cliente) return X;
+    const ab = abertura(A.cliente, mesIni);
+    let ini = { total:ab.total, sub:ab.sub };
+    if (de > mesIni + '-01'){ const pre = movPal(regsCli(A.cliente, mesIni + '-01', diaAntes(de))); ini = { total:ini.total + pre.t, sub:somaSub(ini.sub, pre.sub) }; }
+    const L = regsCli(A.cliente, de, ate);
+    let saldo = ini.total;
+    const linhas = L.map(r => { saldo += r.pal; return { r, saldo }; });
+    const mv = movPal(L), fim = ini.total + mv.t, subFim = somaSub(ini.sub, mv.sub);
+    const nomes = subsDe(A.cliente, true), ativosSub = subsDe(A.cliente), subRows = [], vistos = new Set();
+    ativosSub.concat(nomes, Object.keys(subFim)).forEach(n => { if (!n || vistos.has(n)) return; vistos.add(n); const v = r2(subFim[n] || 0); if (ativosSub.includes(n) || v) subRows.push({ n, v }); });
+    const semSub = r2(fim - subRows.reduce((s, x) => s + x.v, 0));
+    const cfg = volPalDe(A.cliente);
+    let frac = null;
+    if (cfg){
+      const auto = L.filter(r => r.pal === 0 && r.vol > 0 && (cfg.todos || ehSep(r.mov)));
+      const man = meses.flatMap(fracLista).filter(x => up(x.cliente) === up(A.cliente) && (x.data || '') >= de && (x.data || '') <= ate).sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+      const vAuto = auto.reduce((s, r) => s + r.vol, 0), vMan = man.reduce((s, x) => s + (+x.vol || 0), 0);
+      const total = vAuto + vMan, formados = Math.floor(total / cfg.vol), resto = total - formados * cfg.vol;
+      frac = { cfg, auto, ids:new Set(auto.map(r => r.id)), man, vAuto, vMan, total, formados, resto, pct:resto / cfg.vol };
+    }
+    const tempos = L.map(r => dur(r.hi, r.hf)).filter(x => x != null);
+    return Object.assign(X, { ab, ini, L, linhas, fim, frac, subRows, semSub,
+      entr:L.reduce((s, r) => s + (r.pal > 0 ? r.pal : 0), 0), said:L.reduce((s, r) => s + (r.pal < 0 ? -r.pal : 0), 0),
+      temSub:nomes.length > 0 || L.some(r => r.subcli), pecas:L.reduce((s, r) => s + r.un, 0), tempo:tempos.reduce((a, b) => a + b, 0) });
+  }
+
+  /* ---------- tela ---------- */
+  const isAdmin = () => user && user.perfil === 'ADMIN';
+  const opts = (lista, sel, vazio) => (vazio != null ? `<option value="">${vazio}</option>` : '') + lista.map(v => `<option ${v === sel ? 'selected' : ''}>${esc(v)}</option>`).join('');
+  function render(){
+    const root = el('acRoot'); if (!root) return;
+    iniciar();
+    if (typeof S !== 'undefined' && S.view !== 'acertos') return;
+    if (typeof FB === 'undefined' || FB.mov == null || FB.cad == null || DB.oc == null || DB.fr == null){ root.innerHTML = '<div class="ac-vazio">Carregando lançamentos e premissas do banco…</div>'; return; }
+    const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('#acRoot') ? document.activeElement.name : null;
+    const X = calc();
+    const mesesLista = Array.from(new Set(Object.keys(FB.mov || {}).concat([mesAtual(), A.mes]))).sort().reverse();
+    let h = `<div class="ac-ctrl">
+      <label>Cliente<select name="ac-cli" onchange="AC.set('cliente',this.value)">${opts(clientesAtivos(), A.cliente, 'Selecione')}</select></label>
+      <label>Período de corte<span class="ac-seg"><button aria-pressed="${A.modo === 'mes'}" onclick="AC.set('modo','mes')">Mensal</button><button aria-pressed="${A.modo === 'per'}" onclick="AC.set('modo','per')">Por período</button></span></label>
+      ${A.modo === 'mes' ? `<label>Mês<select name="ac-mes" onchange="AC.set('mes',this.value)">${mesesLista.map(m => `<option value="${m}" ${m === A.mes ? 'selected' : ''}>${mesNome(m)}</option>`).join('')}</select></label>`
+        : `<label>De<input type="date" name="ac-de" value="${A.de}" onchange="AC.set('de',this.value)"></label><label>Até<input type="date" name="ac-ate" value="${A.ate}" onchange="AC.set('ate',this.value)"></label>`}
+      <div class="ac-user">${user ? `${esc(user.nome)} (${user.perfil === 'ADMIN' ? 'administrador' : 'operador'}) <button class="ac-mini" onclick="AC.sair()">Sair</button>` : `Somente leitura <button class="btn" onclick="AC.entrar()">Entrar para editar</button>`}</div>
+    </div>`;
+    if (!A.cliente){ root.innerHTML = h + '<div class="ac-vazio">Selecione um cliente para ver o acerto.</div>'; return; }
+    const quando = A.modo === 'mes' ? 'O MÊS DE ' + mesSo(A.mes).toUpperCase() : 'O PERÍODO EM ' + dataBR(X.de);
+    const fonte = X.ab.fonte === 'ocup' ? `Saldo inicial = fechamento de ${mesNome(X.ab.ref)} cadastrado em Ocupação`
+      : X.ab.fonte === 'calc' ? (X.ab.base === 'ocup' ? `Saldo inicial calculado a partir do fechamento de ${mesNome(X.ab.ref)} somando os lançamentos dos meses seguintes` : 'Saldo inicial calculado somando todos os lançamentos anteriores (não há fechamento cadastrado)')
+      : `Sem fechamento cadastrado para ${mesNome(X.ab.ref)}: saldo inicial considerado 0`;
+    const extra = X.de > X.mesIni + '-01' ? `, mais os lançamentos de ${dataBR(X.mesIni + '-01')} a ${dataBR(diaAntes(X.de))}` : '';
+    const cadFim = A.modo === 'mes' ? ocupEntrada(A.cliente, A.mes) : null;
+    const difFim = cadFim && cadFim.pallets != null && cadFim.pallets !== '' && +cadFim.pallets !== r2(X.fim);
+    const nc = (X.temSub ? 12 : 11);
+    const tab = X.L.length ? `<div class="ac-wrap"><table class="ac">
+      <thead><tr><th>DATA MOV</th><th>MÊS</th><th>TIPO MOV</th>${X.temSub ? '<th>SUBCLIENTE</th>' : ''}<th>QTD<br>VOL.</th><th>QTD<br>ENTR PLT</th><th>QTD<br>SAÍDA PLT</th><th>TOTAL DE<br>PALLETS</th><th>TEMPO DE<br>CONFERÊNCIA</th><th>NF / PEDIDO</th><th>QTD<br>PEÇAS</th><th>OBS</th></tr></thead>
+      <tbody>${X.linhas.map(({ r, saldo }) => { const fr = X.frac && X.frac.ids.has(r.id); return `<tr>
+        <td>${dataBR(r.data)}</td><td>${mesSo(r.data)}</td><td class="l">${esc(r.mov)}</td>${X.temSub ? `<td class="l">${esc(r.subcli || '-')}</td>` : ''}
+        <td class="${fr ? 'frac' : ''}" ${fr ? 'title="Volume fracionado: soma na formação de palete"' : ''}>${nf(r.vol)}</td>
+        <td>${r.pal > 0 ? nf(r.pal) : ''}</td><td>${r.pal < 0 ? nf(-r.pal) : ''}</td>
+        <td class="tot ${saldo < 0 ? 'neg' : ''}">${nf(r2(saldo))}</td><td>${fmtDur(dur(r.hi, r.hf))}</td><td>${esc(r.nf)}</td><td>${nf(r.un)}</td><td class="l">${esc(r.obs)}</td></tr>`; }).join('')}</tbody>
+      <tfoot><tr><td colspan="${X.temSub ? 4 : 3}"></td><td>${nf(X.L.reduce((s, r) => s + r.vol, 0))}</td><td>${nf(X.entr)}</td><td>${nf(X.said)}</td><td colspan="${nc - (X.temSub ? 7 : 6)}"></td></tr></tfoot></table></div>`
+      : `<div class="ac-vazio" style="margin:14px 16px">Nenhum lançamento de ${esc(A.cliente)} neste período.</div>`;
+    const quadro = X.temSub ? `<table class="ac-sub"><tbody>
+      ${X.subRows.map(x => `<tr><td>${esc(x.n)}</td><td class="${x.v < 0 ? 'neg' : ''}">${nf(x.v)}</td></tr>`).join('')}
+      ${X.semSub ? `<tr><td style="background:#F4D6C8">SEM SUBCLIENTE</td><td class="${X.semSub < 0 ? 'neg' : ''}">${nf(X.semSub)}</td></tr>` : ''}
+      <tr class="sep"><td></td><td></td></tr><tr><td>TOTAL:</td><td class="${X.fim < 0 ? 'neg' : ''}">${nf(r2(X.fim))}</td></tr></tbody></table>` : '';
+    h += `<div class="ac-acoes">
+      ${isAdmin() ? `<button class="btn" onclick="AC.saldoIni()">Ajustar saldo inicial</button>` : ''}
+      ${isAdmin() && A.modo === 'mes' ? `<button class="btn" onclick="AC.fechamento()">Gravar fechamento de ${mesSo(A.mes)} (${nf(r2(X.fim))})</button>` : ''}
+      <button class="btn" onclick="AC.exportar()">Exportar para Excel</button>
+      <button class="btn pri" onclick="window.print()">Imprimir / PDF</button></div>
+    <div class="ac-folha">
+      <div class="ac-cab">INICIAMOS ${esc(quando)} COM <b>${nf(r2(X.ini.total))}</b> POSIÇÕES OCUPADAS.<small>${esc(fonte + extra)}.</small></div>
+      <div class="ac-cli">${esc(A.cliente)} | ${dataBR(X.de)} a ${dataBR(X.ate)}</div>
+      ${difFim ? `<div class="ac-alerta">O fechamento de ${mesNome(A.mes)} cadastrado em Ocupação é ${nf(+cadFim.pallets)}, mas os lançamentos resultam em ${nf(r2(X.fim))}.${isAdmin() ? ' Confira e use "Gravar fechamento" para atualizar.' : ''}</div>` : ''}
+      ${X.ini.total < 0 || X.fim < 0 ? '<div class="ac-alerta">Saldo negativo: confira o saldo inicial ou algum lançamento com pallets de saída a mais.</div>' : ''}
+      ${tab}
+      <div class="ac-pe">${quadro}<div class="ac-res">
+        <span>Saldo inicial</span><b>${nf(r2(X.ini.total))}</b><span>Entradas de pallets</span><b>+${nf(X.entr)}</b>
+        <span>Saídas de pallets</span><b>−${nf(X.said)}</b><span>Saldo final (posições)</span><b>${nf(r2(X.fim))}</b>
+        <span>Operações</span><b>${nf(X.L.length)}</b><span>Peças movimentadas</span><b>${nf(X.pecas)}</b>
+        <span>Tempo total de conferência</span><b>${fmtDur(X.tempo)}</b></div></div>
+      ${blocoFrac(X)}
+    </div>
+    ${blocoPremissas(X)}`;
+    root.innerHTML = h;
+    if (foco){ const f = root.querySelector('[name="' + foco + '"]'); if (f) f.focus(); }
+  }
+  function blocoFrac(X){
+    const F = X.frac;
+    if (!F) return `<div class="fr no-print"><h3>Formação de paletes por volume fracionado</h3><p class="ac-nota">Ainda não há volumes por palete definidos para ${esc(A.cliente)}. Configure em "Premissas do cliente", abaixo.</p></div>`;
+    const pct = Math.round(F.pct * 1000) / 10, prox = A.modo === 'mes' ? mesMais(A.mes, 1) : '';
+    return `<div class="fr">
+      <h3>Formação de paletes por volume fracionado <span>${nf(F.cfg.vol)} volumes = 1 palete | conta ${F.cfg.todos ? 'todos os movimentos' : 'só separações'} sem palete</span></h3>
+      <div class="fr-num">
+        <div><b>${nf(F.vAuto)}</b><span>vol. fracionados nos lançamentos (${nf(F.auto.length)})</span></div>
+        <div><b>${nf(F.vMan)}</b><span>vol. acumulados lançados à mão (${nf(F.man.length)})</span></div>
+        <div><b>${nf(F.total)}</b><span>volumes acumulados no período</span></div>
+        <div class="dest"><b>${nf(F.formados)}</b><span>palete(s) formado(s) a cobrar</span></div></div>
+      <div class="fr-bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${Math.min(100, Math.max(0, pct))}%"></i></div>
+      <div><b>${String(pct).replace('.', ',')}%</b> do próximo palete | ${nf(F.resto)} de ${nf(F.cfg.vol)} volumes | faltam <b>${nf(F.cfg.vol - F.resto)}</b></div>
+      <p class="fr-cob">Paletes cobráveis no período: <b>${nf(X.entr)}</b> entrada + <b>${nf(X.said)}</b> saída + <b>${nf(F.formados)}</b> formados por fracionado = <b>${nf(X.entr + X.said + F.formados)}</b></p>
+      ${F.man.length ? `<table class="ac" style="max-width:760px;margin-bottom:10px"><thead><tr><th>DATA</th><th>VOLUMES ACUMULADOS</th><th>OBS</th><th>LANÇADO POR</th>${isAdmin() ? '<th class="no-print"></th>' : ''}</tr></thead><tbody>
+        ${F.man.map(x => `<tr><td>${dataBR(x.data)}</td><td>${nf(x.vol)}</td><td class="l">${esc(x.obs || '')}</td><td>${esc(x.por || '')}</td>${isAdmin() ? `<td class="no-print"><button class="ac-mini" onclick="AC.excluirFrac('${esc(x.mes)}','${esc(x.id)}')">Excluir</button></td>` : ''}</tr>`).join('')}</tbody></table>` : ''}
+      <div class="ac-acoes no-print" style="justify-content:flex-start;margin-bottom:0">
+        ${user ? `<button class="btn pri" onclick="AC.lancarFrac()">Lançar volumes acumulados</button>` : '<span class="ac-nota">Entre para lançar volumes acumulados.</span>'}
+        ${isAdmin() && prox && F.resto > 0 ? `<button class="btn" onclick="AC.sobra()">Levar sobra de ${nf(F.resto)} vol. para ${mesSo(prox)}</button>` : ''}
+      </div></div>`;
+  }
+  function blocoPremissas(X){
+    const subs = subLista().filter(x => up(x.cliente) === up(A.cliente)).sort((a, b) => (b.ativo - a.ativo) || a.nome.localeCompare(b.nome));
+    const vp = cad('volpal')[chave(up(A.cliente))] || {};
+    const adm = isAdmin();
+    return `<div class="ac-prem">
+      <h2>Premissas do cliente ${esc(A.cliente)}</h2>
+      <p class="ac-nota">As mesmas do app ESTOQUE (mesmo banco). ${adm ? '' : 'Só administradores alteram.'}</p>
+      <div class="grid">
+        <div><h3>Subclientes (ocupação)</h3>
+          ${subs.length ? subs.map(x => `<div class="ac-linha ${x.ativo ? '' : 'off'}"><span class="nm">${esc(x.nome)}</span><span class="ac-tag ${x.ativo ? '' : 'off'}">${x.ativo ? 'Ativo' : 'Inativo'}</span>
+            ${adm ? `<button class="ac-mini" onclick="AC.subRenomear('${esc(x.key)}')">Renomear</button><button class="ac-mini" onclick="AC.subAlternar('${esc(x.key)}')">${x.ativo ? 'Desativar' : 'Ativar'}</button>` : ''}</div>`).join('')
+            : '<p class="ac-nota">Nenhum subcliente cadastrado.</p>'}
+          ${adm ? `<div style="display:flex;gap:8px;margin-top:10px"><input name="ac-sub-novo" placeholder="Novo subcliente" style="text-transform:uppercase;flex:1;border:1px solid var(--line);border-radius:6px;padding:6px 8px"><button class="btn" onclick="AC.subAdd()">Adicionar</button></div>` : ''}
+          <p class="ac-nota">Com subclientes ativos, o app ESTOQUE pede o subcliente em cada lançamento deste cliente.</p></div>
+        <div><h3>Formação de paletes</h3>
+          <div class="ac-linha"><span class="nm">Volumes que formam 1 palete</span><b>${+vp.vol > 0 ? nf(vp.vol) : 'não definido'}</b></div>
+          <div class="ac-linha"><span class="nm">Conta como fracionado</span><span>${vp.tipos === 'TODOS' ? 'Todos os movimentos sem palete' : 'Só separações sem palete'}</span></div>
+          ${adm ? `<button class="btn" style="margin-top:10px" onclick="AC.volPal()">${+vp.vol > 0 ? 'Alterar' : 'Definir'} volumes por palete</button>` : ''}</div>
+        <div><h3>Saldo inicial e fechamento</h3>
+          <div class="ac-linha"><span class="nm">Fechamento de ${mesNome(mesMais(X.mesIni, -1))}</span><b>${(() => { const e = ocupEntrada(A.cliente, mesMais(X.mesIni, -1)); return e && e.pallets != null ? nf(e.pallets) : 'não cadastrado'; })()}</b></div>
+          ${A.modo === 'mes' ? `<div class="ac-linha"><span class="nm">Fechamento de ${mesNome(A.mes)}</span><b>${cadFimTxt()}</b></div>` : ''}
+          <p class="ac-nota">O fechamento de um mês é o saldo inicial do mês seguinte. Fica em Cadastros, Ocupação no app ESTOQUE.</p></div>
+      </div></div>`;
+  }
+  function cadFimTxt(){ const e = ocupEntrada(A.cliente, A.mes); return e && e.pallets != null ? nf(e.pallets) : 'não cadastrado'; }
+
+  /* ---------- janela e gravação ---------- */
+  function janela(titulo, corpo, okTxt, onOk){
+    let d = el('acDlg');
+    if (!d){ d = document.createElement('dialog'); d.id = 'acDlg'; d.className = 'ac-dlg'; document.body.appendChild(d); }
+    d.innerHTML = `<form method="dialog" onsubmit="return false"><h3>${esc(titulo)}</h3><div class="corpo">${corpo}<div class="ac-err-box"></div></div>
+      <div class="rod"><button type="button" class="btn" data-x>Cancelar</button>${okTxt ? `<button type="submit" class="btn pri" data-ok>${esc(okTxt)}</button>` : ''}</div></form>`;
+    const f = d.querySelector('form');
+    d.querySelector('[data-x]').onclick = () => d.close();
+    f.onsubmit = async e => { e.preventDefault(); if (!f.reportValidity()) return; try { const r = await onOk(f); if (r !== false) d.close(); } catch(err){ d.querySelector('.ac-err-box').innerHTML = `<div class="err">${esc(err.message || err)}</div>`; } };
+    d.showModal();
+    const p = f.querySelector('input,select'); if (p) p.focus();
+    return f;
+  }
+  async function gravar(mapa, msg){
+    const r = raiz(); if (!r) throw new Error('O banco ainda não conectou.');
+    await Promise.race([r.update(mapa), new Promise((_, no) => setTimeout(() => no(new Error('O banco não confirmou a gravação. Verifique a conexão.')), 20000))]);
+    if (msg) avisar(msg);
+  }
+  const exigeAdmin = () => { if (!isAdmin()) throw new Error('Entre como administrador para alterar.'); };
+
+  const AC = window.AC = {
+    render,
+    set(k, v){ A[k] = v; render(); },
+    entrar(){
+      janela('Entrar para editar', `<p class="ac-nota" style="margin:0">Use o mesmo usuário e senha do app ESTOQUE.</p>
+        <label>Usuário<input name="u" required autocomplete="off" style="text-transform:uppercase"></label><label>Senha<input name="s" type="password" required></label>`, 'Entrar', async f => {
+        const login = chave(up(f.u.value)); const r = raiz(); if (!r) throw new Error('O banco ainda não conectou.');
+        const sn = await r.child('usuarios/' + login).once('value'); const u = sn.val();
+        if (!u || String(u.senha) !== String(f.s.value) || u.ativo === false) throw new Error('Usuário ou senha inválidos.');
+        user = { usuario:login, nome:u.nome || login, perfil:u.perfil === 'ADMIN' ? 'ADMIN' : 'OPERADOR' };
+        sessionStorage.setItem('ac_user', JSON.stringify(user)); render(); avisar('Bem-vindo, ' + user.nome + '.');
+      });
+    },
+    sair(){ user = null; sessionStorage.removeItem('ac_user'); render(); },
+    saldoIni(){
+      exigeAdmin(); const X = calc(); const ref = mesMais(X.mesIni, -1), cli = X.cliente, e = ocupEntrada(cli, ref), sub = subDeOcup(cli, e && e.sub), nomes = subsDe(cli);
+      const f = janela('Saldo inicial de ' + cli, `<p class="ac-nota" style="margin:0">Posições ocupadas no fechamento de <b>${mesNome(ref)}</b>. É o ponto de partida do acerto de ${mesNome(X.mesIni)}.</p>
+        <label>Total de posições<input name="tot" type="number" step="1" required value="${e && e.pallets != null ? e.pallets : r2(X.ab.total)}"></label>
+        ${nomes.map(n => `<label>${esc(n)}<input type="number" step="1" data-sub="${esc(n)}" value="${sub[n] == null ? '' : sub[n]}"></label>`).join('')}
+        ${nomes.length ? '<p class="ac-nota" style="margin:0">A diferença entre o total e a soma dos subclientes aparece como "Sem subcliente".</p>' : ''}`, 'Salvar saldo inicial', async f2 => {
+        const s2 = {}; f2.querySelectorAll('[data-sub]').forEach(i => { if (i.value.trim() !== '') s2[chave(i.dataset.sub)] = Number(i.value) || 0; });
+        const k = 'ocupacao/' + ref + '/' + chave(cli);
+        await gravar({ [k + '/cliente']:cli, [k + '/pallets']:Number(f2.tot.value) || 0, [k + '/sub']:Object.keys(s2).length ? s2 : null }, 'Saldo inicial salvo.');
+      });
+      f.addEventListener('input', ev => { if (ev.target.dataset.sub == null) return; const t = Array.from(f.querySelectorAll('[data-sub]')).reduce((s, i) => s + (Number(i.value) || 0), 0); if (t) f.tot.value = t; });
+    },
+    async fechamento(){
+      exigeAdmin(); const X = calc(), m = A.mes, e = ocupEntrada(X.cliente, m), fim = r2(X.fim);
+      if (!confirm('Gravar ' + nf(fim) + ' posições como fechamento de ' + mesNome(m) + ' para ' + X.cliente + '?' + (e && e.pallets != null ? '\nO valor cadastrado hoje é ' + nf(+e.pallets) + '.' : '') + (m >= mesAtual() ? '\nAtenção: o mês ainda não terminou.' : '') + '\nEsse fechamento vira o saldo inicial de ' + mesNome(mesMais(m, 1)) + '.')) return;
+      const sub = {}; X.subRows.forEach(x => { sub[chave(x.n)] = x.v; });
+      const k = 'ocupacao/' + m + '/' + chave(X.cliente);
+      try { await gravar({ [k + '/cliente']:X.cliente, [k + '/pallets']:fim, [k + '/sub']:Object.keys(sub).length ? sub : null }, 'Fechamento de ' + mesNome(m) + ' gravado.'); } catch(err){ alert(err.message); }
+    },
+    volPal(){
+      exigeAdmin(); const cli = A.cliente, x = cad('volpal')[chave(up(cli))] || {};
+      janela('Volumes por palete: ' + cli, `<label>Quantidade mínima de volumes que forma 1 palete<input name="v" type="number" min="0" step="1" required value="${x.vol || ''}"></label>
+        <label>Contar como fracionado<select name="t"><option value="SEP" ${x.tipos !== 'TODOS' ? 'selected' : ''}>Só separações de pedido lançadas sem palete</option><option value="TODOS" ${x.tipos === 'TODOS' ? 'selected' : ''}>Todos os movimentos lançados sem palete</option></select></label>
+        <p class="ac-nota" style="margin:0">Deixe 0 para desligar a formação de paletes deste cliente.</p>`, 'Salvar', async f => {
+        const v = Math.max(0, Math.round(Number(f.v.value) || 0));
+        await gravar({ ['cad/volpal/' + chave(up(cli))]: v ? { nome:up(cli), ativo:true, vol:v, tipos:f.t.value } : null }, v ? 'Volumes por palete salvos.' : 'Formação de paletes desligada.');
+      });
+    },
+    lancarFrac(){
+      if (!user) return AC.entrar();
+      const X = calc(), hoje = hojeISO(), dt = hoje < X.de ? X.de : hoje > X.ate ? X.ate : hoje;
+      janela('Lançar volumes acumulados: ' + X.cliente, `<p class="ac-nota" style="margin:0">Soma de itens separados com pouca volumetria que não foram lançados em paletes.</p>
+        <label>Data<input name="d" type="date" required value="${dt}"></label><label>Volumes<input name="v" type="number" step="1" required></label>
+        <label>Observação<input name="o" placeholder="Ex.: pedidos pequenos da semana 38"></label><p class="ac-nota" style="margin:0">Use número negativo para corrigir um lançamento anterior.</p>`, 'Salvar volumes', async f => {
+        const vol = Math.round(Number(f.v.value) || 0); if (!vol) throw new Error('Informe a quantidade de volumes.');
+        const d = f.d.value;
+        await gravar({ ['frac/' + d.slice(0,7) + '/' + novoId()]: { data:d, cliente:up(X.cliente), vol, obs:f.o.value.trim() || null, por:user.usuario, ts:Date.now() } }, nf(vol) + ' volumes lançados.');
+      });
+    },
+    async excluirFrac(m, id){
+      try { exigeAdmin(); } catch(e){ return alert(e.message); }
+      const x = ((DB.fr || {})[m] || {})[id]; if (!x || !confirm('Excluir o lançamento de ' + nf(x.vol) + ' volumes de ' + dataBR(x.data) + '?')) return;
+      try { await gravar({ ['frac/' + m + '/' + id]: null }, 'Lançamento de volumes excluído.'); } catch(e){ alert(e.message); }
+    },
+    async sobra(){
+      try { exigeAdmin(); } catch(e){ return alert(e.message); }
+      const X = calc(), F = X.frac; if (!F || A.modo !== 'mes') return;
+      const prox = mesMais(A.mes, 1), ja = fracLista(prox).find(x => up(x.cliente) === up(X.cliente) && x.origem === A.mes);
+      if (!confirm((ja ? 'Já existe uma sobra de ' + mesNome(A.mes) + ' em ' + mesNome(prox) + ' (' + nf(ja.vol) + ' vol.). Substituir por ' : 'Lançar ') + nf(F.resto) + ' volumes em 01/' + prox.slice(5) + '/' + prox.slice(0,4) + ' como sobra de ' + mesNome(A.mes) + '?')) return;
+      try { await gravar({ ['frac/' + prox + '/' + (ja ? ja.id : novoId())]: { data:prox + '-01', cliente:up(X.cliente), vol:F.resto, obs:'Sobra de ' + mesNome(A.mes), origem:A.mes, por:user.usuario, ts:Date.now() } }, 'Sobra levada para ' + mesNome(prox) + '.'); } catch(e){ alert(e.message); }
+    },
+    async subAdd(){
+      try { exigeAdmin(); } catch(e){ return alert(e.message); }
+      const i = document.querySelector('[name="ac-sub-novo"]'), nome = up(i && i.value), cli = up(A.cliente);
+      if (!nome) return;
+      if (subLista().some(x => up(x.nome) === nome && up(x.cliente) === cli)) return alert('"' + nome + '" já está cadastrado para ' + cli + '.');
+      try { await gravar({ ['cad/subclientes/' + chave(cli + ' ' + nome)]: { nome, cliente:cli, ativo:true } }, '"' + nome + '" adicionado em ' + cli + '.'); } catch(e){ alert(e.message); }
+    },
+    async subRenomear(key){
+      const x = subLista().find(i => i.key === key); if (!x) return;
+      const novo = up(prompt('Novo nome para "' + x.nome + '":', x.nome) || ''); if (!novo || novo === x.nome) return;
+      if (subLista().some(i => up(i.nome) === novo && up(i.cliente) === up(x.cliente) && i.key !== key)) return alert('"' + novo + '" já está cadastrado.');
+      try { exigeAdmin(); await gravar({ ['cad/subclientes/' + key + '/nome']: novo }, 'Nome atualizado. Os lançamentos antigos continuam com "' + x.nome + '".'); } catch(e){ alert(e.message); }
+    },
+    async subAlternar(key){
+      const x = subLista().find(i => i.key === key); if (!x) return;
+      try { exigeAdmin(); await gravar({ ['cad/subclientes/' + key + '/ativo']: !x.ativo }, x.ativo ? 'Subcliente desativado.' : 'Subcliente ativado.'); } catch(e){ alert(e.message); }
+    },
+    exportar(){
+      const X = calc(); if (!X.cliente) return;
+      const q = v => { const s2 = String(v == null ? '' : v); return /[;"\n]/.test(s2) ? '"' + s2.replace(/"/g,'""') + '"' : s2; };
+      const L = [['ACERTO ' + X.cliente, dataBR(X.de) + ' a ' + dataBR(X.ate)], ['SALDO INICIAL', r2(X.ini.total)], [],
+        ['DATA MOV','MÊS','TIPO MOV'].concat(X.temSub ? ['SUBCLIENTE'] : [], ['QTD VOL','QTD ENTR PLT','QTD SAÍDA PLT','TOTAL DE PALLETS','TEMPO DE CONFERENCIA','NF / PEDIDO','QTD PEÇAS','OBS'])];
+      X.linhas.forEach(({ r, saldo }) => L.push([dataBR(r.data), mesSo(r.data), r.mov].concat(X.temSub ? [r.subcli] : [], [r.vol, r.pal > 0 ? r.pal : '', r.pal < 0 ? -r.pal : '', r2(saldo), fmtDur(dur(r.hi, r.hf)), r.nf, r.un, r.obs])));
+      L.push(['', '', ''].concat(X.temSub ? [''] : [], [X.L.reduce((s, r) => s + r.vol, 0), X.entr, X.said]), []);
+      if (X.temSub){ X.subRows.forEach(x => L.push([x.n, x.v])); if (X.semSub) L.push(['SEM SUBCLIENTE', X.semSub]); }
+      L.push(['TOTAL', r2(X.fim)]);
+      if (X.frac){ const F = X.frac; L.push([], ['FORMAÇÃO DE PALETES (VOLUME FRACIONADO)', F.cfg.vol + ' volumes = 1 palete'], ['Volumes fracionados nos lançamentos', F.vAuto], ['Volumes acumulados lançados à mão', F.vMan],
+        ['Total de volumes', F.total], ['Paletes formados a cobrar', F.formados], ['Sobra (volumes)', F.resto, Math.round(F.pct * 1000) / 10 + '%'], ['Paletes cobráveis no período', X.entr + X.said + F.formados]);
+        F.man.forEach(x => L.push(['Acumulado ' + dataBR(x.data), x.vol, x.obs || '', x.por || ''])); }
+      const blob = new Blob(['﻿' + L.map(l => l.map(q).join(';')).join('\r\n')], { type:'text/csv;charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'acerto_' + X.cliente.replace(/[^A-Z0-9]+/gi, '_') + '_' + X.de + '_a_' + X.ate + '.csv';
+      document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    }
+  };
+  const tentar = setInterval(() => { iniciar(); if (DB.iniciado) clearInterval(tentar); }, 500);
 })();
 </script>
 </body>
