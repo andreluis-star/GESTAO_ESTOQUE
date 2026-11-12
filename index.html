@@ -122,6 +122,8 @@ table.ov.occ tfoot tr.cap td{background:#F9E1DE;color:var(--occ-dark)}
 table.ov.occ tfoot tr.cap td.avg{background:var(--occ-dark)!important;color:#fff}
 table.ov td.zero-out{background:var(--warn)!important}
 table.ov td.neg{color:var(--bad);font-weight:700}
+table.ov td.calc{font-style:italic;color:#5C6778}
+table.ov td.atual{font-weight:700;color:var(--navy)}
 table.ov.val th{background:var(--val)}
 table.ov.val th.avg{background:var(--val-dark);font-weight:700}
 table.ov.val td.avg{background:var(--val-dark)!important;color:#fff;font-weight:700;text-align:right}
@@ -320,8 +322,9 @@ dialog.ac-dlg::backdrop{background:rgba(15,37,71,.45)}
       <div class="tw" style="border-radius:0 6px 6px 6px"><table class="ov occ" id="tOcc"></table></div>
       <div class="ov-legend">
         <span><i style="background:var(--warn)"></i>Cliente zerou o estoque no mês</span>
-        <span><b style="color:var(--bad)">−3</b> Saldo negativo: revisar lançamentos ou saldo inicial</span>
-        <span>Saldo de paletes no fim de cada mês (mês corrente: saldo até hoje). Passe o mouse para ver entradas e saídas.</span>
+        <span><b style="color:var(--bad)">−3</b> Saldo negativo: revisar lançamentos ou fechamento</span>
+        <span><i style="background:#fff;border:1px dashed #9AA6B8"></i><em>Itálico</em> = calculado pelos lançamentos (sem fechamento gravado)</span>
+        <span>Saldo no fim de cada mês: mês fechado usa o fechamento gravado em Ocupação (o mesmo do Acerto e do app ESTOQUE); mês corrente, saldo até hoje.</span>
       </div>
     </div>
     <div class="ov-block">
@@ -331,8 +334,9 @@ dialog.ac-dlg::backdrop{background:rgba(15,37,71,.45)}
         <select id="valAdd" class="btn"></select>
         <button class="btn" id="valAddBtn">Adicionar cliente</button>
         <div class="grow"></div>
-        <span class="sub" style="margin:0">Valores editáveis: digite e saia do campo para salvar. Célula vazia = mês sem informação.</span>
+        <span class="sub" style="margin:0">Valores gravados no banco: administrador digita e sai do campo para salvar. Célula vazia = mês sem informação.</span>
       </div>
+      <div class="sub" id="valAviso" style="margin-top:8px"></div>
     </div>
     <div class="panel"><h2>Paletes ocupados x valor armazenado</h2><p class="sub">Total de paletes no fim do mês, capacidade e valor armazenado</p><div class="chartbox"><canvas id="chOv"></canvas></div></div>
   </section>
@@ -353,19 +357,14 @@ dialog.ac-dlg::backdrop{background:rgba(15,37,71,.45)}
 
     <div class="panel">
       <h2>Premissas de controle de paletes</h2>
-      <p class="sub">A ocupação é calculada assim: saldo inicial do cliente + paletes de entrada e devolução − paletes de separação lançados a partir da data base.</p>
+      <p class="sub">Fonte única, a mesma do Acerto e do app ESTOQUE: saldo atual = fechamento do mês anterior gravado em Ocupação + paletes lançados neste mês (positivo entra, negativo sai). Para corrigir um saldo, ajuste o fechamento na aba Acertos ou em Cadastros, Ocupação no app ESTOQUE.</p>
       <div class="form-grid">
-        <label>Capacidade do armazém (posições de palete)<input type="number" id="cCap" min="0" step="1"></label>
-        <label>Data base do saldo inicial<input type="date" id="cBase"></label>
-        <label class="chk"><input type="checkbox" id="cSign"> Aplicar sinal pelo tipo de movimento (entrada e devolução somam, separação subtrai)</label>
-        <label>ID da planilha<input type="text" id="cSheet"></label>
+        <label>Capacidade do armazém (posições de palete, gravada no banco)<input type="number" id="cCap" min="0" step="1"></label>
       </div>
       <div class="toolbar">
-        <button class="btn" id="cFromInicio">Preencher saldos com os lançamentos "Início"</button>
+        <span class="sub" id="cAviso" style="margin:0"></span>
         <div class="grow"></div>
-        <button class="btn" id="cExport">Baixar config.json</button>
-        <label class="btn" style="margin:0">Importar config.json<input type="file" id="cImport" accept=".json,application/json" hidden></label>
-        <button class="btn pri" id="cSave">Salvar premissas</button>
+        <button class="btn pri" id="cSave">Salvar capacidade</button>
       </div>
       <div class="tw"><table class="t" id="tPal"></table></div>
       <p class="foot">As premissas e os valores armazenados ficam salvos neste navegador. Para que todos vejam os mesmos números, baixe o config.json e suba no repositório do GitHub junto com este index.html; o painel usa a versão mais recente entre o arquivo e o navegador.</p>
@@ -633,15 +632,11 @@ async function lerIniciosPlanilha(){
 let iniPedido = false;
 function fbAplicar(){
   if (FB.mov == null || FB.cad == null) return;
-  /* saldo inicial lido em segundo plano: não atrasa a tela */
-  if (!FB.iniLido && !iniPedido){ iniPedido = true; lerIniciosPlanilha().then(() => { if (FB.ini.length) fbAplicar(); }); }
   buildRowsFirebase(regsFirebase());
-  S.rows = FB.ini.concat(S.rows);
   S.clientes = cadNomes('clientes');
   S.clientesAtivos = new Set(cadNomes('clientes', true));
   S.colabs = cadNomes('colaboradores');
   S.movs = cadNomes('movimentos');
-  if (!S.cfg.saldosDefinidos && Object.keys(S.cfg.saldos).length === 0) S.cfg.saldos = saldosDoInicio();
   S.loaded = true;
   $('alert').innerHTML = '';
   $('loading').style.display = 'none';
@@ -722,20 +717,15 @@ function saveCfg(msg){
 /* =========================================================
    CÁLCULOS
    ========================================================= */
-function palSigned(r){
-  if (!S.cfg.forceSign) return r.pal;
-  const a = Math.abs(r.pal);
-  if (r.mk === 'SEP') return -a;
-  if (r.mk === 'ENT' || r.mk === 'DEV') return a;
-  return r.pal;
-}
+/* paletes como lançados no app ESTOQUE (positivo = entrada, negativo = saída), igual ao Acerto */
+function palSigned(r){ return r.pal; }
 function saldosDoInicio(){
   const s = {};
   S.rows.filter(r => r.isInicio).forEach(r => { s[r.cliente] = (s[r.cliente] || 0) + Math.abs(r.pal); });
   return s;
 }
 function allClients(){
-  const set = new Set([...ORDEM_PRINT.filter(c => S.clientes.includes(c) || S.rows.some(r => r.cliente === c)), ...S.clientes, ...S.rows.map(r => r.cliente), ...Object.keys(S.cfg.saldos)]);
+  const set = new Set([...ORDEM_PRINT.filter(c => S.clientes.includes(c) || S.rows.some(r => r.cliente === c)), ...S.clientes, ...S.rows.map(r => r.cliente), ...(window.AC && AC.pronto() ? AC.clientesComSaldo() : [])]);
   const arr = [...set].filter(Boolean);
   const pos = c => { const i = ORDEM_PRINT.indexOf(c); return i < 0 ? 999 : i; };
   return arr.sort((a,b) => pos(a) - pos(b) || a.localeCompare(b));
@@ -768,29 +758,29 @@ function aggBy(list, keyFn){
   m.forEach(a => { a.avg = a.durN ? a.dur/a.durN : null; MK.forEach(k => a['a'+k] = a['c'+k] ? a['d'+k]/a['c'+k] : null); });
   return m;
 }
+/* FONTE ÚNICA (mesma do Acerto e do app ESTOQUE):
+   saldo = fechamento do mês anterior gravado em Ocupação (banco) + paletes lançados no mês */
 function saldoAte(endYmd){
   const s = {};
-  allClients().forEach(c => s[c] = S.cfg.saldos[c] || 0);
-  S.rows.forEach(r => {
-    if (r.isInicio || !r.ymd || r.ymd < S.cfg.dataBase || r.ymd > endYmd) return;
-    s[r.cliente] = (s[r.cliente] || 0) + palSigned(r);
-  });
+  if (!(window.AC && AC.pronto())) return s;
+  allClients().forEach(c => { s[c] = AC.saldoCli(c, endYmd); });
   return s;
 }
 function ocupacaoAno(y){
-  const today = todayYmd(), base = S.cfg.dataBase;
+  const today = todayYmd(), base = window.AC && AC.pronto() ? AC.primeiroMes() + '-01' : today;
   const meses = [];
   for (let m = 1; m <= 12; m++){
-    const ini = ymd(y,m,1), fim = ymd(y,m,lastDay(y,m));
-    if (fim < base || ini > today) { meses.push(null); continue; }
-    const saldo = saldoAte(fim < today ? fim : today);
+    const ini = ymd(y,m,1), fim = ymd(y,m,lastDay(y,m)), mm = ini.slice(0,7);
+    if (fim < base || ini > today || !(window.AC && AC.pronto())) { meses.push(null); continue; }
+    const saldo = {}, fonte = {};
+    allClients().forEach(c => { const x = AC.fimMes(c, mm); saldo[c] = x.v; fonte[c] = x.fonte; });
     const flux = {};
     S.rows.forEach(r => {
-      if (r.isInicio || !r.ymd || r.ymd < ini || r.ymd > fim || r.ymd < base) return;
+      if (!r.ymd || r.ymd < ini || r.ymd > fim) return;
       const f = flux[r.cliente] || (flux[r.cliente] = {in:0,out:0});
       const p = palSigned(r); if (p > 0) f.in += p; else f.out += -p;
     });
-    meses.push({saldo, flux});
+    meses.push({saldo, fonte, flux});
   }
   return meses;
 }
@@ -809,7 +799,7 @@ function fillFilters(){
   $('fMes').innerHTML = opt('','Todo o período') + yms.map(ym => opt(ym, MESES[+ym.slice(5)-1].charAt(0) + MESES[+ym.slice(5)-1].slice(1).toLowerCase() + ' ' + ym.slice(0,4))).join('') + opt('custom','Período personalizado');
   $('fCli').value = keep.cli; $('fMov').value = keep.mov; $('fCol').value = keep.col; $('fMes').value = keepMes;
   // anos para Ocupação x Valor
-  const anos = new Set([+S.cfg.dataBase.slice(0,4), new Date().getFullYear(), ...Object.keys(S.cfg.valores).map(Number)]);
+  const anos = new Set([new Date().getFullYear(), ...(window.AC && AC.pronto() ? [+AC.primeiroMes().slice(0,4)] : [])]);
   S.rows.forEach(r => r.ymd && anos.add(+r.ymd.slice(0,4)));
   const sel = $('ovAno'), cur = sel.value || String(new Date().getFullYear());
   sel.innerHTML = [...anos].filter(Boolean).sort().map(a => `<option>${a}</option>`).join('');
@@ -843,7 +833,7 @@ function renderGeral(list){
   const a = aggBy(list, () => 'T').get('T') || newAgg();
   if (a.avg === undefined) a.avg = null;
   const occ = ocupacaoAtual();
-  const cap = S.cfg.capacidade || 0;
+  const cap = window.AC ? AC.capacidade() : 0;
   $('kpis').innerHTML = [
     ['Movimentos', fmtInt(a.total), `${fmtInt(a.nENT||0)} entradas · ${fmtInt(a.nSEP||0)} separações`],
     ['Tempo médio por movimento', fmtMin(a.avg), `${fmtInt(a.durN)} lançamentos com horário`],
@@ -958,7 +948,7 @@ function renderOV(){
   const y = +$('ovAno').value || new Date().getFullYear();
   $('valAnoLbl').textContent = y;
   const meses = ocupacaoAno(y);
-  const cap = S.cfg.capacidade || 0;
+  const cap = window.AC ? AC.capacidade() : 0;
   const clientes = allClients().filter(c => S.clientesAtivos.has(c) || meses.some(m => m && (m.saldo[c] || 0) !== 0) || ORDEM_PRINT.includes(c) && S.clientes.includes(c));
   const head = `<thead><tr><th>CLIENTE</th>${MESES.map(m => `<th>${m}</th>`).join('')}<th class="avg">MÉDIA DE OCUPAÇÃO</th></tr></thead>`;
   const body = clientes.map(c => {
@@ -967,8 +957,10 @@ function renderOV(){
       if (v == null) return '<td></td>';
       const prev = i > 0 ? vals[i-1] : null;
       const fl = meses[i].flux[c] || {in:0,out:0};
-      const cls = [v === 0 && prev > 0 ? 'zero-out' : '', v < 0 ? 'neg' : ''].join(' ').trim();
-      return `<td class="${cls}" title="${esc(c)} · ${MESES[i]}\nEntradas: +${fl.in}\nSaídas: −${fl.out}">${v}</td>`;
+      const fo = meses[i].fonte[c];
+      const cls = [v === 0 && prev > 0 ? 'zero-out' : '', v < 0 ? 'neg' : '', fo === 'calc' ? 'calc' : '', fo === 'atual' ? 'atual' : ''].join(' ').trim();
+      const ft = fo === 'ocup' ? 'Fechamento gravado (Ocupação)' : fo === 'atual' ? 'Mês corrente: saldo até hoje' : 'Calculado pelos lançamentos (sem fechamento gravado)';
+      return `<td class="${cls}" title="${esc(c)} · ${MESES[i]}\n${ft}\nEntradas: +${fl.in}\nSaídas: −${fl.out}">${v}</td>`;
     }).join('');
     const ok = vals.filter(v => v != null);
     const avg = ok.length ? ok.reduce((a,b)=>a+b,0)/ok.length : null;
@@ -982,19 +974,25 @@ function renderOV(){
     <tr class="cap"><td>% de ocupação</td>${tots.map(v => `<td>${v == null || !cap ? '' : fmtPct(v/cap)}</td>`).join('')}<td class="avg">${avgT == null || !cap ? '' : fmtPct(avgT/cap)}</td></tr></tfoot>`;
   $('tOcc').innerHTML = head + `<tbody>${body}</tbody>` + foot;
 
-  // Valor armazenado
+  // Valor armazenado: banco (valores/{ano}); enquanto o ano não estiver no banco, mostra o que este navegador tinha
   const key = String(y);
-  if (!S.cfg.valores[key]) S.cfg.valores[key] = {};
-  const V = S.cfg.valores[key];
-  const ordem = (S.cfg.valoresOrdem[key] || Object.keys(V)).filter(c => V[c]);
-  Object.keys(V).forEach(c => { if (!ordem.includes(c)) ordem.push(c); });
-  S.cfg.valoresOrdem[key] = ordem;
+  const VB = window.AC && AC.pronto() ? AC.valoresAno(y) : null;
+  const local = (S.cfg.valores && S.cfg.valores[key]) || {};
+  const V = VB || local;
+  const pos = c => { const i = ORDEM_PRINT.indexOf(c); return i < 0 ? 999 : i; };
+  const ordem = Object.keys(V).sort((a,b) => pos(a) - pos(b) || a.localeCompare(b));
+  const adm = window.AC && AC.isAdmin();
+  $('valAviso').innerHTML = VB ? (adm ? '' : `Somente leitura. <button class="btn" onclick="AC.entrar()">Entrar como administrador</button> para editar.`)
+    : (Object.keys(local).length ? `Os valores de ${y} ainda não estão no banco (exibindo os deste navegador). ${adm ? `<button class="btn pri" id="valEnviar">Enviar para o banco</button>` : '<button class="btn" onclick="AC.entrar()">Entrar como administrador</button> para enviar.'}`
+       : `Sem valores de ${y} no banco.${adm ? ' Use "Adicionar cliente".' : ''}`);
+  const bEnv = $('valEnviar'); if (bEnv) bEnv.onclick = async () => { try { await AC.enviarValores(y, local); } catch(e){ alert(e.message); } };
+  $('valAddBtn').disabled = !(adm && VB !== undefined); $('valAdd').disabled = !adm;
   const vhead = `<thead><tr><th>CLIENTE</th>${MESES.map(m => `<th>${m}</th>`).join('')}<th class="avg">MÉDIA EM ARMAZENAGEM</th></tr></thead>`;
   const vbody = ordem.map(c => {
     const arr = pad12(V[c] || []);
     const ok = arr.filter(v => v != null);
     const avg = ok.length ? ok.reduce((a,b)=>a+b,0)/ok.length : null;
-    return `<tr><td>${esc(c)}</td>${arr.map((v,i) => `<td><input inputmode="decimal" data-cli="${esc(c)}" data-m="${i}" value="${v == null ? '' : fmtBRL(v)}" aria-label="${esc(c)} ${MESES[i]}"></td>`).join('')}<td class="avg">${avg == null ? '' : fmtBRL(avg)}</td></tr>`;
+    return `<tr><td>${esc(c)}</td>${arr.map((v,i) => `<td><input inputmode="decimal" data-cli="${esc(c)}" data-m="${i}" value="${v == null ? '' : fmtBRL(v)}" aria-label="${esc(c)} ${MESES[i]}" ${adm && VB ? '' : 'readonly'}></td>`).join('')}<td class="avg">${avg == null ? '' : fmtBRL(avg)}</td></tr>`;
   }).join('');
   const vt = MESES.map((_,i) => { const vs = ordem.map(c => (V[c]||[])[i]).filter(v => v != null); return vs.length ? vs.reduce((a,b)=>a+b,0) : null; });
   const okV = vt.filter(v => v != null);
@@ -1019,12 +1017,16 @@ function renderOV(){
 
 /* ---------- Paletes ---------- */
 function renderPal(){
-  const cap = +S.cfg.capacidade || 0;
-  $('cCap').value = cap; $('cBase').value = S.cfg.dataBase; $('cSign').checked = !!S.cfg.forceSign; $('cSheet').value = S.cfg.sheetId;
-  const atual = saldoAte(todayYmd());
+  const cap = window.AC ? AC.capacidade() : 0;
+  const adm = window.AC && AC.isAdmin();
+  if (document.activeElement !== $('cCap')) $('cCap').value = cap || '';
+  $('cCap').readOnly = !adm; $('cSave').style.display = adm ? '' : 'none';
+  $('cAviso').innerHTML = adm ? '' : 'Somente leitura. <button class="btn" onclick="AC.entrar()">Entrar como administrador</button> para alterar a capacidade.';
+  const hoje = todayYmd(), mesIni = hoje.slice(0,7) + '-01', mesAnt = (() => { const d = new Date(hoje + 'T12:00:00'); d.setDate(0); return ymd(d.getFullYear(), d.getMonth()+1, d.getDate()); })();
+  const atual = saldoAte(hoje), abre = saldoAte(mesAnt);
   const fl = {};
   S.rows.forEach(r => {
-    if (r.isInicio || !r.ymd || r.ymd < S.cfg.dataBase) return;
+    if (!r.ymd || r.ymd < mesIni || r.ymd > hoje) return;
     const f = fl[r.cliente] || (fl[r.cliente] = {in:0,out:0});
     const p = palSigned(r); if (p > 0) f.in += p; else f.out += -p;
   });
@@ -1050,14 +1052,14 @@ function renderPal(){
   $('rack').innerHTML = html;
   $('rackLegend').innerHTML = ord.map(c => `<span><i style="background:${colorOf(c)}"></i>${esc(c)} <b>${fmtInt(atual[c])}</b></span>`).join('') + (cap ? '<span><i style="background:#fff;border:1px solid #CBD3DE"></i>Livre</span>' : '');
 
-  const rows = clientes.map(c => ({ nome:c, ini: S.cfg.saldos[c] || 0, ent:(fl[c]||{}).in||0, sai:(fl[c]||{}).out||0, atual: atual[c] || 0 }));
+  const rows = clientes.map(c => ({ nome:c, ini: abre[c] || 0, ent:(fl[c]||{}).in||0, sai:(fl[c]||{}).out||0, atual: atual[c] || 0 })).filter(r => r.ini || r.ent || r.sai || r.atual || S.clientesAtivos.has(r.nome));
   const st = S.sort.tPal;
   rows.sort((x,y) => { const a = x[st.k], b = y[st.k]; const r = typeof a === 'string' ? a.localeCompare(b) : a - b; return st.asc ? r : -r; });
   const th = (k,t) => `<th data-k="${k}" class="${st.k===k?'sorted'+(st.asc?' asc':''):''}">${t}</th>`;
   const max = Math.max(1, ...rows.map(r => r.atual));
-  $('tPal').innerHTML = `<thead><tr>${th('nome','Cliente')}${th('ini','Saldo inicial')}${th('ent','Entradas desde a base')}${th('sai','Saídas desde a base')}${th('atual','Saldo atual')}<th>% da capacidade</th><th style="text-align:left">Participação</th></tr></thead>
+  $('tPal').innerHTML = `<thead><tr>${th('nome','Cliente')}${th('ini','Fechamento do mês anterior')}${th('ent','Entradas no mês')}${th('sai','Saídas no mês')}${th('atual','Saldo atual')}<th>% da capacidade</th><th style="text-align:left">Participação</th></tr></thead>
     <tbody>${rows.map(r => `<tr><td class="l"><b>${esc(r.nome)}</b></td>
-      <td><input class="num" type="number" step="1" data-saldo="${esc(r.nome)}" value="${r.ini}"></td>
+      <td>${fmtInt(r.ini)}</td>
       <td>+${fmtInt(r.ent)}</td><td>−${fmtInt(r.sai)}</td>
       <td class="${r.atual < 0 ? 'yes' : ''}"><b>${fmtInt(r.atual)}</b></td>
       <td>${cap ? fmtPct(r.atual/cap) : '—'}</td>
@@ -1118,61 +1120,19 @@ $('tVal').addEventListener('focusin', e => {
   const i = e.target.closest('input'); if (!i) return;
   const v = parseNum(i.value); i.value = v == null ? '' : nf2.format(v); i.select();
 });
-$('tVal').addEventListener('change', e => {
-  const i = e.target.closest('input'); if (!i) return;
-  const y = $('ovAno').value, c = i.dataset.cli, m = +i.dataset.m;
-  const V = S.cfg.valores[y]; V[c] = pad12(V[c] || []);
-  V[c][m] = parseNum(i.value);
-  saveCfg('Valor armazenado salvo');
-  renderOV();
+$('tVal').addEventListener('change', async e => {
+  const i = e.target.closest('input'); if (!i || i.readOnly) return;
+  try { await AC.setValor($('ovAno').value, i.dataset.cli, +i.dataset.m, parseNum(i.value)); toast('Valor armazenado salvo no banco'); }
+  catch(err){ alert(err.message); renderOV(); }
 });
-$('valAddBtn').addEventListener('click', () => {
+$('valAddBtn').addEventListener('click', async () => {
   const c = $('valAdd').value; if (!c) return;
-  const y = $('ovAno').value;
-  S.cfg.valores[y] = S.cfg.valores[y] || {};
-  S.cfg.valores[y][c] = pad12([]);
-  (S.cfg.valoresOrdem[y] = S.cfg.valoresOrdem[y] || []).push(c);
-  saveCfg('Cliente adicionado ao valor armazenado');
-  renderOV();
+  try { await AC.addValorCliente($('ovAno').value, c); } catch(err){ alert(err.message); }
 });
 
-// premissas de paletes
-function readPalForm(){
-  S.cfg.capacidade = Math.max(0, parseInt($('cCap').value || '0', 10));
-  S.cfg.dataBase = $('cBase').value || S.cfg.dataBase;
-  S.cfg.forceSign = $('cSign').checked;
-  document.querySelectorAll('#tPal input[data-saldo]').forEach(i => { S.cfg.saldos[i.dataset.saldo] = parseNum(i.value) || 0; });
-  S.cfg.saldosDefinidos = true;
-}
-$('cSave').addEventListener('click', () => {
-  const sheet = $('cSheet').value.trim();
-  const m = sheet.match(/\/d\/([a-zA-Z0-9-_]+)/);
-  const newId = m ? m[1] : sheet;
-  readPalForm();
-  const reload = newId && newId !== S.cfg.sheetId;
-  if (newId) S.cfg.sheetId = newId;
-  saveCfg('Premissas salvas');
-  if (reload) loadAll(); else renderAll();
-});
-$('cFromInicio').addEventListener('click', () => {
-  const s = saldosDoInicio();
-  if (!Object.keys(s).length){ toast('Nenhum lançamento "Início" encontrado na planilha'); return; }
-  S.cfg.saldos = s; S.cfg.saldosDefinidos = true;
-  saveCfg('Saldos iniciais preenchidos com os lançamentos "Início"');
-  renderAll();
-});
-$('cExport').addEventListener('click', () => {
-  readPalForm(); saveCfg();
-  download(new Blob([JSON.stringify(S.cfg, null, 2)], {type:'application/json'}), 'config.json');
-});
-$('cImport').addEventListener('change', async e => {
-  const f = e.target.files[0]; if (!f) return;
-  try {
-    const c = JSON.parse(await f.text());
-    S.cfg = mergeCfg(c); saveCfg('Configuração importada');
-    fillFilters(); renderAll();
-  } catch(err){ toast('Arquivo inválido: use um config.json exportado por este painel'); }
-  e.target.value = '';
+// capacidade do armazém → banco (fonte única)
+$('cSave').addEventListener('click', async () => {
+  try { await AC.setCapacidade($('cCap').value); } catch(err){ alert(err.message); }
 });
 
 /* =========================================================
@@ -1221,7 +1181,9 @@ $('cImport').addEventListener('change', async e => {
 
   /* ---------- dados ---------- */
   const A = { cliente:'', modo:'mes', mes:mesAtual(), de:hojeISO().slice(0,8) + '01', ate:hojeISO() };
-  const DB = { oc:null, fr:null, iniciado:false };
+  const DB = { oc:null, fr:null, cfg:null, val:null, iniciado:false };
+  /* re-renderiza o painel inteiro (Ocupação x Valor e Paletes também leem daqui) */
+  const tudo = () => { if (typeof renderAll === 'function' && typeof S !== 'undefined' && S.loaded) renderAll(); else render(); };
   let user = null; try { user = JSON.parse(sessionStorage.getItem('ac_user') || 'null'); } catch(e){}
   function raiz(){ try { return firebase.app('estoque').database().ref('estoque'); } catch(e){ return null; } }
   function iniciar(){
@@ -1229,8 +1191,10 @@ $('cImport').addEventListener('change', async e => {
     const r = raiz(); if (!r) return;
     DB.iniciado = true;
     const ouvir = () => {
-      r.child('ocupacao').on('value', s => { DB.oc = s.val() || {}; render(); }, () => { DB.oc = {}; render(); });
-      r.child('frac').on('value', s => { DB.fr = s.val() || {}; render(); }, () => { DB.fr = {}; render(); });
+      r.child('ocupacao').on('value', s => { DB.oc = s.val() || {}; tudo(); }, () => { DB.oc = {}; tudo(); });
+      r.child('frac').on('value', s => { DB.fr = s.val() || {}; tudo(); }, () => { DB.fr = {}; tudo(); });
+      r.child('config').on('value', s => { DB.cfg = s.val() || {}; tudo(); }, () => { DB.cfg = {}; tudo(); });
+      r.child('valores').on('value', s => { DB.val = s.val() || {}; tudo(); }, () => { DB.val = {}; tudo(); });
     };
     let ok = false; const go = () => { if (!ok){ ok = true; ouvir(); } };
     try { firebase.app('estoque').auth().onAuthStateChanged(u => { if (u) go(); }); } catch(e){}
@@ -1308,7 +1272,7 @@ $('cImport').addEventListener('change', async e => {
     const root = el('acRoot'); if (!root) return;
     iniciar();
     if (typeof S !== 'undefined' && S.view !== 'acertos') return;
-    if (typeof FB === 'undefined' || FB.mov == null || FB.cad == null || DB.oc == null || DB.fr == null){ root.innerHTML = '<div class="ac-vazio">Carregando lançamentos e premissas do banco…</div>'; return; }
+    if (!pronto()){ root.innerHTML = '<div class="ac-vazio">Carregando lançamentos e premissas do banco…</div>'; return; }
     const foco = document.activeElement && document.activeElement.closest && document.activeElement.closest('#acRoot') ? document.activeElement.name : null;
     const X = calc();
     const mesesLista = Array.from(new Set(Object.keys(FB.mov || {}).concat([mesAtual(), A.mes]))).sort().reverse();
@@ -1430,8 +1394,38 @@ $('cImport').addEventListener('change', async e => {
   }
   const exigeAdmin = () => { if (!isAdmin()) throw new Error('Entre como administrador para alterar.'); };
 
+  /* ---------- fonte única para as outras abas ---------- */
+  const pronto = () => typeof FB !== 'undefined' && FB.mov != null && FB.cad != null && DB.oc != null && DB.fr != null && DB.cfg != null && DB.val != null;
+  /* saldo do cliente no fim do dia ymd = abertura do mês + lançamentos do mês até ymd */
+  function saldoCli(cli, ymd){ const m = ymd.slice(0,7); return r2(abertura(cli, m).total + movPal(regsCli(cli, m + '-01', ymd)).t); }
+  /* saldo no fim do mês: mês fechado usa o fechamento gravado em Ocupação; sem ele (ou mês corrente) calcula pelos lançamentos */
+  function fimMes(cli, m){
+    const hoje = hojeISO(), fimM = ultimoDia(m);
+    const e = ocupEntrada(cli, m);
+    if (fimM < hoje && e && e.pallets != null && e.pallets !== '') return { v:+e.pallets || 0, fonte:'ocup' };
+    return { v:saldoCli(cli, fimM < hoje ? fimM : hoje), fonte:fimM < hoje ? 'calc' : 'atual' };
+  }
+  const primeiroMes = () => [Object.keys((typeof FB !== 'undefined' && FB.mov) || {}).sort()[0], Object.keys(DB.oc || {}).sort()[0]].filter(Boolean).sort()[0] || mesAtual();
+  function clientesComSaldo(){ const s = new Set(); Object.values(DB.oc || {}).forEach(o => Object.values(o || {}).forEach(x => x && x.cliente && s.add(up(x.cliente)))); registros().forEach(r => r.cliente && s.add(r.cliente)); return [...s]; }
+  const capacidade = () => +(DB.cfg && DB.cfg.capacidade) || 0;
+  /* valor armazenado: valores/{ano}/{CLIENTE} = { cliente, m01..m12 } */
+  function valoresAno(y){
+    const o = (DB.val || {})[String(y)]; if (!o) return null;
+    const out = {}; Object.values(o).forEach(x => { if (!x || !x.cliente) return; out[x.cliente] = Array.from({ length:12 }, (_, i) => { const v = x['m' + p2(i + 1)]; return v == null || v === '' ? null : +v; }); });
+    return out;
+  }
+
   const AC = window.AC = {
-    render,
+    render, pronto, saldoCli, fimMes, primeiroMes, clientesComSaldo, capacidade, valoresAno,
+    isAdmin: () => isAdmin(), logado: () => !!user,
+    async setCapacidade(v){ exigeAdmin(); await gravar({ 'config/capacidade': Math.max(0, Math.round(+v || 0)) }, 'Capacidade salva no banco.'); },
+    async setValor(y, cli, i, v){ exigeAdmin(); const k = 'valores/' + y + '/' + chave(up(cli)); await gravar({ [k + '/cliente']: cli, [k + '/m' + p2(i + 1)]: v == null ? null : v }); },
+    async addValorCliente(y, cli){ exigeAdmin(); await gravar({ ['valores/' + y + '/' + chave(up(cli)) + '/cliente']: cli }, 'Cliente adicionado ao valor armazenado.'); },
+    async enviarValores(y, V){
+      exigeAdmin(); const mapa = {};
+      Object.entries(V || {}).forEach(([cli, arr]) => { const k = 'valores/' + y + '/' + chave(up(cli)); mapa[k + '/cliente'] = cli; (arr || []).forEach((v, i) => { if (v != null) mapa[k + '/m' + p2(i + 1)] = v; }); });
+      await gravar(mapa, 'Valores de ' + y + ' enviados para o banco.');
+    },
     set(k, v){ A[k] = v; render(); },
     entrar(){
       janela('Entrar para editar', `<p class="ac-nota" style="margin:0">Use o mesmo usuário e senha do app ESTOQUE.</p>
@@ -1440,10 +1434,10 @@ $('cImport').addEventListener('change', async e => {
         const sn = await r.child('usuarios/' + login).once('value'); const u = sn.val();
         if (!u || String(u.senha) !== String(f.s.value) || u.ativo === false) throw new Error('Usuário ou senha inválidos.');
         user = { usuario:login, nome:u.nome || login, perfil:u.perfil === 'ADMIN' ? 'ADMIN' : 'OPERADOR' };
-        sessionStorage.setItem('ac_user', JSON.stringify(user)); render(); avisar('Bem-vindo, ' + user.nome + '.');
+        sessionStorage.setItem('ac_user', JSON.stringify(user)); tudo(); avisar('Bem-vindo, ' + user.nome + '.');
       });
     },
-    sair(){ user = null; sessionStorage.removeItem('ac_user'); render(); },
+    sair(){ user = null; sessionStorage.removeItem('ac_user'); tudo(); },
     saldoIni(){
       exigeAdmin(); const X = calc(); const ref = mesMais(X.mesIni, -1), cli = X.cliente, e = ocupEntrada(cli, ref), sub = subDeOcup(cli, e && e.sub), nomes = subsDe(cli);
       const f = janela('Saldo inicial de ' + cli, `<p class="ac-nota" style="margin:0">Posições ocupadas no fechamento de <b>${mesNome(ref)}</b>. É o ponto de partida do acerto de ${mesNome(X.mesIni)}.</p>
